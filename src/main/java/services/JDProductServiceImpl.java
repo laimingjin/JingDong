@@ -3,10 +3,8 @@ package services;
 /**
  * Created by minlai on 12/13/2016.
  */
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
+import java.sql.Connection;
+import java.util.*;
 
 import entitys.ProductInfo;
 import org.jsoup.Jsoup;
@@ -17,18 +15,28 @@ import utils.Constants;
 import utils.PriceCheckUtil;
 
 public class JDProductServiceImpl implements  ProductService{
-    private String productName;
+    private String productKindName;
     private String jdUrl;
     private static PriceCheckUtil pcu = PriceCheckUtil.getInstance();
 
-    public JDProductServiceImpl(String jdUrl, String productName){
+    public JDProductServiceImpl(String jdUrl, String productKindName){
         this.jdUrl = jdUrl;
-        this.productName = productName;
+        this.productKindName = productKindName;
     }
 
     public List<ProductInfo> getProductList() {
         List<ProductInfo> jdProductList = new ArrayList<ProductInfo>();
         ProductInfo productInfo = null;
+        String productid;
+        String productName;
+        String productPrice;
+        String productImageUrl;
+        String tradeNum;
+        String productUrl;
+        String shopName;
+        String ecName;
+        Date date;
+
         String url = "";
         for(int i = 0; i < 10; i++){
             try {
@@ -36,7 +44,8 @@ public class JDProductServiceImpl implements  ProductService{
                 if(i == 0) {
                     url = jdUrl;
                 }else{
-                    url = Constants.JDURL + pcu.getGbk(productName) + Constants.JDENC + Constants.JDPAGE + (i + 1);
+//                    url = Constants.JDURL + pcu.getGbk(productKindName) + Constants.JDENC + Constants.JDPAGE + (i + 1);
+                    url = Constants.JDURL + productKindName + Constants.JDENC + Constants.JDPAGE + (i + 1);
                 }
                 System.out.println(url);
                 Document document = Jsoup.connect(url).timeout(5000).get();
@@ -48,15 +57,31 @@ public class JDProductServiceImpl implements  ProductService{
                     Iterator<Element> liIter = lis.iterator();
                     while(liIter.hasNext()) {
                         Element li = liIter.next();
-                        Element div = li.select("div[class=gl-i-wrap]").first();
-                        Elements title = div.select("div[class=p-name p-name-type-2]>a");
-                        String productName = title.attr("title"); //得到商品名称
-                        Elements price = div.select(".p-price>strong");
-                        String productPrice =price.attr("data-price"); //得到商品价格
                         productInfo = new ProductInfo();
+                        productid=li.attr("data-sku");
+                        Element div = li.select("div[class=gl-i-wrap]").first();
+                        Elements image=div.select("div[class=p-img]>a");
+                        productImageUrl=image.select(">img").attr("src");
+                        productUrl=image.attr("href");
+                        Elements title = div.select("div[class=p-name p-name-type-2]>a");
+                        productName = title.attr("title");
+                        Elements price = div.select(".p-price>strong");
+                        productPrice =price.attr("data-price"); //得到商品价格
+                        Elements commit=div.select("div[class=p-commit]>strong>a");
+                        tradeNum=commit.text();
+                        Elements shop=div.select("div[class=p-icons]>img");
+                        shopName=shop.attr("data-tips");
+
+                        productInfo.setProductId(productid);
                         productInfo.setProductName(productName);
                         productInfo.setProductPrice(productPrice);
-                        System.out.println("productInfo:   "+productInfo.getProductName()+" "+productInfo.getProductPrice());
+                        productInfo.setProductImageUrl(productImageUrl);
+                        productInfo.setTradeNum(tradeNum);
+                        productInfo.setProductUrl(productUrl);
+                        productInfo.setShopName(shopName);
+                        productInfo.setEcName("京东");
+                        productInfo.setDate(new Date());
+                        //System.out.println("productInfo:   "+productid+" "+productName+" "+productPrice+" "+productImageUrl+" "+tradeNum+" "+productUrl+shopName);
                         jdProductList.add(productInfo);
                     }
                 }
@@ -70,14 +95,30 @@ public class JDProductServiceImpl implements  ProductService{
 
     public static void main(String[] args) {
         try {
-            String productName = "书包";
+            String productKindName = "铅笔";
            // String jdUrl = Constants.JDURL + pcu.getGbk(productName)  + Constants.JDENC;
-            String jdUrl = Constants.JDURL + productName  + Constants.JDENC;
-            List<ProductInfo> list = new JDProductServiceImpl(jdUrl, productName).getProductList();
+            String jdUrl = Constants.JDURL + productKindName  + Constants.JDENC;
+            List<ProductInfo> list = new JDProductServiceImpl(jdUrl, productKindName).getProductList();
             System.out.println(list.size());
+            DBHelper dbHelper=new DBHelper();
+            Connection connection=dbHelper.connection;
+            String sql="insert into jingDongProduct values(?,?,?,?,?,?,?,?,?)";
+            ArrayList<String> params=null;
             for(ProductInfo pi : list){
-                System.out.println(pi.getProductName() + "  " + pi.getProductPrice());
+                params=new ArrayList<String>();
+                params.add(pi.getProductId());
+                params.add(pi.getProductName());
+                params.add(pi.getProductPrice());
+                params.add(pi.getProductImageUrl());
+                params.add(pi.getTradeNum());
+                params.add(pi.getProductUrl());
+                params.add(pi.getShopName());
+                params.add(pi.getEcName());
+                params.add(pi.getDate().toString());
+                //System.out.println(pi.getProductName() + "  " + pi.getProductPrice());
+              dbHelper.add(connection,sql,params);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -12,7 +12,7 @@ public class ProductInfo implements Serializable{
     /**
      * 商品ID
      */
-    private String productid;
+    private String productId;
     /**
      * 商品名称
      */
@@ -21,6 +21,10 @@ public class ProductInfo implements Serializable{
      * 商品价格
      */
     private String productPrice;
+    /**
+     * 商品图片地址
+     */
+    private String productImageUrl;
     /**
      * 月销售笔数
      */
@@ -42,11 +46,11 @@ public class ProductInfo implements Serializable{
      */
     private Date date;
 
-    public String getProductid() {
-        return productid;
+    public String getProductId() {
+        return productId;
     }
-    public void setProductid(String productid) {
-        this.productid = productid;
+    public void setProductId(String productid) {
+        this.productId = productid;
     }
     public String getProductName() {
         return productName;
@@ -91,4 +95,10 @@ public class ProductInfo implements Serializable{
         this.date = date;
     }
 
+    public String getProductImageUrl() {
+        return productImageUrl;
+    }
+    public void setProductImageUrl(String productImageUrl) {
+        this.productImageUrl = productImageUrl;
+    }
 }

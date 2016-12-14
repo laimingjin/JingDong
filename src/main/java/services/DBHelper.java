@@ -105,6 +105,7 @@ public class DBHelper {
             dataSource.setAllowMultiQueries(true);
             dataSource.setPassword(DB_PASSWORD);
             dataSource.setDatabaseName(DB_DATABASE);
+            dataSource.setCharacterEncoding("utf8");
             connection = dataSource.getConnection();
             //System.out.print("Connection to server successful!:" + connection + "\n\n");
         } catch (Exception e) {

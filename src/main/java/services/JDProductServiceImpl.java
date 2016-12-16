@@ -27,6 +27,7 @@ public class JDProductServiceImpl implements  ProductService{
         this.productKindName = productKindName;
     }
 
+    public JDProductServiceImpl(){}
     public List<ProductInfo> getProductList() {
         List<ProductInfo> jdProductList = new ArrayList<ProductInfo>();
         ProductInfo productInfo = null;
@@ -104,9 +105,14 @@ public class JDProductServiceImpl implements  ProductService{
     }
 
     public static void main(String[] args) {
+        JDProductServiceImpl jdProductService=new JDProductServiceImpl();
+        String productKindName = "铅笔";
+        jdProductService.addProductToDB(productKindName);
+    }
+
+    public void addProductToDB(String productKindName){
         try {
-            String productKindName = "铅笔";
-           // String jdUrl = Constants.JDURL + pcu.getGbk(productName)  + Constants.JDENC;
+            // String jdUrl = Constants.JDURL + pcu.getGbk(productName)  + Constants.JDENC;
             String jdUrl = Constants.JDURL + productKindName  + Constants.JDENC;
             List<ProductInfo> list = new JDProductServiceImpl(jdUrl, productKindName).getProductList();
             System.out.println(list.size());
@@ -126,7 +132,8 @@ public class JDProductServiceImpl implements  ProductService{
                 params.add(pi.getEcName());
                 params.add(pi.getDate().toString());
                 //System.out.println(pi.getProductName() + "  " + pi.getProductPrice());
-              dbHelper.add(connection,sql,params);
+                dbHelper.add(connection,sql,params);
+                dbHelper.closeConnection();
             }
 
         } catch (Exception e) {

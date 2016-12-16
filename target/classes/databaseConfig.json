@@ -1,15 +1,15 @@
 [
   {
-    "ssh_host": "115.159.194.234",
+    "ssh_host": "10.64.202.79",
     "ssh_port": "22",
-    "ssh_username": "ubuntu",
-    "ssh_password": "GLCWssb2333",
+    "ssh_username": "minlai",
+    "ssh_password": "131250032lmjLMJ",
     "remote_host": "localhost",
     "remote_port": "3306",
     "db_host": "localhost",
     "db_port": "8860",
     "db_username": "root",
-    "db_password": "GLCWssb2333",
+    "db_password": "",
     "db_database": "digging"
   }
 ]

@@ -3,9 +3,6 @@ package services;
 /**
  * Created by minlai on 12/13/2016.
  */
-import java.sql.Connection;
-import java.util.*;
-
 import entitys.ProductInfo;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,6 +10,12 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import utils.Constants;
 import utils.PriceCheckUtil;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 public class JDProductServiceImpl implements  ProductService{
     private String productKindName;
@@ -61,7 +64,14 @@ public class JDProductServiceImpl implements  ProductService{
                         productid=li.attr("data-sku");
                         Element div = li.select("div[class=gl-i-wrap]").first();
                         Elements image=div.select("div[class=p-img]>a");
-                        productImageUrl=image.select(">img").attr("src");
+                        String tempImage=image.select(">img").attr("src");
+                        if(tempImage==null || tempImage.equals("")){
+                            productImageUrl=image.select(">img").attr("data-lazy-img");
+                        }else{
+                            productImageUrl=image.select(">img").attr("src");
+                        }
+                        
+                       
                         productUrl=image.attr("href");
                         Elements title = div.select("div[class=p-name p-name-type-2]>a");
                         productName = title.attr("title");
@@ -102,7 +112,7 @@ public class JDProductServiceImpl implements  ProductService{
             System.out.println(list.size());
             DBHelper dbHelper=new DBHelper();
             Connection connection=dbHelper.connection;
-            String sql="insert into jingDongProduct values(?,?,?,?,?,?,?,?,?)";
+            String sql="insert into jingdong values(?,?,?,?,?,?,?,?,?)";
             ArrayList<String> params=null;
             for(ProductInfo pi : list){
                 params=new ArrayList<String>();
